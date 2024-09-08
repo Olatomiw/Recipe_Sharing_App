@@ -36,4 +36,23 @@ public class Recipe {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy ="recipe")
     private List<Comment> myComments;
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RecipeIngredient> myRecipeIngredients;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> myRatings;
+
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "recipe")
+    private List<SavedRecipe> mySavedRecipes;
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<RecipeIngredient> myIngredients;
+
+    @ManyToMany
+    @JoinTable(
+            name = "recipe_tags", joinColumns = @JoinColumn(name = "recipe_id"),
+            inverseJoinColumns = @JoinColumn(name ="tag_id")
+    )
+    private List<Tag> myTags;
+
 }

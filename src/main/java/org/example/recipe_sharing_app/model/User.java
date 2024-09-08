@@ -46,4 +46,10 @@ public class User {
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List <Recipe> my_recipes;
 
+    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rating> my_ratings;
+
+    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<SavedRecipe> my_saved_recipes;
+
 }
