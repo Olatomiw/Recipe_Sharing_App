@@ -1,8 +1,5 @@
 package org.example.recipe_sharing_app.config;
 
-import jakarta.persistence.Column;
-import jakarta.servlet.Filter;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,8 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 import org.springframework.security.web.SecurityFilterChain;
-
-import java.util.List;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -25,8 +21,10 @@ import java.util.List;
 public class SecurityConfig  {
 
     private final AuthEntryPoint authEntryPoint;
+    private final JWTAuthFilter jwtAuthFilter;
+
     @Bean
-    public SecurityFilterChain springSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         DefaultSecurityFilterChain securityFilterChain = http
                 .csrf(e->e.disable())
                 .authorizeHttpRequests(e->e
@@ -36,8 +34,8 @@ public class SecurityConfig  {
                 .sessionManagement(e->e
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(Customizer.withDefaults())
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-
         return securityFilterChain;
     }
 

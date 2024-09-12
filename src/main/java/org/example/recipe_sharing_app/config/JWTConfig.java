@@ -6,6 +6,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -57,8 +58,8 @@ public class JWTConfig {
         return extractExpiration(token).before(new Date());
     }
 
-    public Boolean validateToken(String token, Authentication authentication) {
-        String username = authentication.getPrincipal().toString();
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        String username = userDetails.getUsername();
         return extractUsername(token).equals(username) && !isTokenExpired(token);
     }
 
