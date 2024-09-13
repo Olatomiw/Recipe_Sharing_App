@@ -33,7 +33,7 @@ public class User {
     private String email;
 
     @Column(nullable = false)
-    @Size(min = 8, max = 20)
+//    @Size(min = 8, max = 20)
     private String password;
 
     @JsonIgnore
