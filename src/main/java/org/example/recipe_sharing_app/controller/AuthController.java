@@ -2,6 +2,7 @@ package org.example.recipe_sharing_app.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.example.recipe_sharing_app.dto.LoginDto;
 import org.example.recipe_sharing_app.dto.RegisterDto;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.service.AuthenticationService;
@@ -23,4 +24,9 @@ public class AuthController {
     public ResponseEntity<?> registerUser( @RequestBody RegisterDto registerDto) {
        return authenticationService.registerUser(registerDto);
     };
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginUser( @RequestBody LoginDto loginDto) {
+        return authenticationService.login(loginDto);
+    }
 }
