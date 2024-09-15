@@ -8,6 +8,7 @@ import org.example.recipe_sharing_app.dto.RegisterDto;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.UserRepository;
 import org.example.recipe_sharing_app.service.AuthenticationService;
+import org.example.recipe_sharing_app.util.InfoGetter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,7 @@ public class AuthServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JWTConfig jwtConfig;
+    private final InfoGetter infoGetter;
 
 
     @Override
@@ -60,4 +62,18 @@ public class AuthServiceImpl implements AuthenticationService {
                 .build();
         return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
+
+    @Override
+    public ResponseEntity<?> changePassword(String oldPassword, String newPassword) {
+        User user= infoGetter.getLoggedInUser().getBody();
+        if (user != null ) {
+            passwordEncoder.matches(oldPassword,user.getPassword());
+            user.setPassword(passwordEncoder.encode(newPassword));
+            userRepository.save(user);
+        }
+
+        return null;
+    }
+
+
 }

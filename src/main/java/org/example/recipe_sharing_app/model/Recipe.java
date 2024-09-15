@@ -1,6 +1,9 @@
 package org.example.recipe_sharing_app.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -8,6 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table (name = "recipes")
@@ -24,7 +29,8 @@ public class Recipe {
     private String instructions;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "author_id", nullable = false)
+    @JoinColumn(name = "author_id", referencedColumnName = "id")
+    @JsonIgnore
     private User user;
 
     @Column(name = "created_at",nullable = false) @CreationTimestamp
@@ -44,9 +50,6 @@ public class Recipe {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "recipe")
     private List<SavedRecipe> mySavedRecipes;
-
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RecipeIngredient> myIngredients;
 
     @ManyToMany
     @JoinTable(
