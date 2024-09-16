@@ -26,7 +26,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public ResponseEntity<?> createRecipe(CreateRecipeRequestDto recipeRequestDto) {
-       User user= infoGetter.getLoggedInUser().getBody();
+       User user= infoGetter.getLoggedInUser();
         assert user != null;
         List<Recipe> myRecipes = user.getMy_recipes();
         Recipe newRecipe = Recipe.builder()

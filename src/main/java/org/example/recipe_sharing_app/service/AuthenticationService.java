@@ -9,5 +9,5 @@ public interface AuthenticationService {
 
     ResponseEntity<?>registerUser(RegisterDto registerDto);
     ResponseEntity<?>login(LoginDto loginDto);
-    ResponseEntity<?>changePassword(String oldPassword, String newPassword);
+
 }

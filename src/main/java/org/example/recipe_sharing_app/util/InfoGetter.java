@@ -18,12 +18,11 @@ public class InfoGetter {
 
     private final UserRepository userRepository;
 
-    public ResponseEntity<User> getLoggedInUser() {
+    public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
             String name = authentication.getName();
-            User loggedInUser = userRepository.findByEmail(name).orElseThrow(() -> new UsernameNotFoundException("User not found"));
-            return new ResponseEntity<>(loggedInUser, HttpStatus.OK);
+            return userRepository.findByEmail(name).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         }
         return null;
     }

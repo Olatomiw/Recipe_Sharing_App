@@ -63,17 +63,6 @@ public class AuthServiceImpl implements AuthenticationService {
         return new ResponseEntity<>(authResponseDto, HttpStatus.OK);
     }
 
-    @Override
-    public ResponseEntity<?> changePassword(String oldPassword, String newPassword) {
-        User user= infoGetter.getLoggedInUser().getBody();
-        if (user != null ) {
-            passwordEncoder.matches(oldPassword,user.getPassword());
-            user.setPassword(passwordEncoder.encode(newPassword));
-            userRepository.save(user);
-        }
-
-        return null;
-    }
 
 
 }
