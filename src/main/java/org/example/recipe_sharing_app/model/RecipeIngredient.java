@@ -2,9 +2,11 @@ package org.example.recipe_sharing_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
 @Table(name = "recipe_ingredient")
+@Data
 public class RecipeIngredient {
 
     @Id

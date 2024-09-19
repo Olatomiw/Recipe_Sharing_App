@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.recipe_sharing_app.dto.GetUserDto;
 import org.example.recipe_sharing_app.dto.UpdatePasswordRequest;
+import org.example.recipe_sharing_app.dto.UpdateUserRequest;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.UserRepository;
 import org.example.recipe_sharing_app.service.UserService;
@@ -65,5 +66,21 @@ public class UserServiceImpl implements UserService {
         user.setPassword(passwordEncoder.encode(updatePasswordRequest.getNewPassword()));
         userRepository.save(user);
         return new ResponseEntity<>("Success", HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> updateUser(UpdateUserRequest updateUserRequest, Authentication authentication) {
+        String name = authentication.getName();
+        User user= infoGetter.getLoggedInUser();
+        if (!name.equals(user.getEmail())){
+            return new ResponseEntity<>("UNAUTHORIZED",HttpStatus.UNAUTHORIZED);
+        }
+        user.setFirstname(updateUserRequest.getFirstname());
+        user.setLastname(updateUserRequest.getLastname());
+        user.setEmail(updateUserRequest.getEmail());
+        userRepository.save(user);
+
+
+        return null;
     }
 }
