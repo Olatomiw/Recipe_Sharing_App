@@ -1,5 +1,6 @@
 package org.example.recipe_sharing_app.serviceImpl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
 import org.example.recipe_sharing_app.model.Ingredient;
@@ -8,6 +9,7 @@ import org.example.recipe_sharing_app.model.RecipeIngredient;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.IngredientRepository;
 import org.example.recipe_sharing_app.repository.RecipeIngredientRepository;
+import org.example.recipe_sharing_app.repository.RecipeRepository;
 import org.example.recipe_sharing_app.repository.UserRepository;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.example.recipe_sharing_app.util.InfoGetter;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @RequiredArgsConstructor
@@ -30,13 +33,16 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeIngredientRepository recipeIngredientRepository;
 
     private final InfoGetter infoGetter;
+    private final RecipeRepository recipeRepository;
 
 
+    @Transactional
     @Override
     public ResponseEntity<?> createRecipe(CreateRecipeRequestDto recipeRequestDto) {
        User user= infoGetter.getLoggedInUser();
         assert user != null;
         List<Recipe> myRecipes = user.getMy_recipes();
+
         Recipe newRecipe = Recipe.builder()
                .id(UUID.randomUUID().toString())
                 .user(user)
@@ -45,43 +51,43 @@ public class RecipeServiceImpl implements RecipeService {
                .description(recipeRequestDto.getDescription())
                .instructions(recipeRequestDto.getInstructions())
                .build();
-        List<RecipeIngredient> myRecipeIngredients = new ArrayList<>();
+        List<Ingredient> newIngredients = new ArrayList<>();
 
-        for(CreateRecipeRequestDto.CreateIngredientDto ingredientDto
-                : recipeRequestDto.getIngredients()) {
-            Ingredient ingredient;
-            if (ingredientDto.getId()!=null){
-                Optional<Ingredient> optionalIngredient = ingredientRepository.findById(ingredientDto.getId());
-                if (optionalIngredient.isPresent()) {
-                    ingredient = optionalIngredient.get();
+        List<RecipeIngredient> recipeIngredients = recipeRequestDto.getIngredients()
+                .stream()
+                .map(ingredientDto->{
+                    Ingredient ingredient =getOrCreate(ingredientDto, newIngredients);
+                    return RecipeIngredient.builder()
+                            .id(UUID.randomUUID().toString())
+                            .ingredient(ingredient)
+                            .recipe(newRecipe)
+                            .quantity(ingredientDto.getQuantity())
+                            .build();
+                }).collect(Collectors.toList());
 
-                    RecipeIngredient recipeIngredient = new RecipeIngredient();
-                    recipeIngredient.setId(UUID.randomUUID().toString());
-                    recipeIngredient.setIngredient(ingredient);
-                    recipeIngredient.setRecipe(newRecipe);
-                    myRecipeIngredients.add(recipeIngredient);
-                }
-                else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Ingredient not found");
-                }
-            } else if ( ingredientDto.getIngredientName()!=null) {
-                   Ingredient ingredients = new Ingredient();
-                   ingredients.setId(UUID.randomUUID().toString());
-                   ingredients.setName(ingredientDto.getIngredientName());
-
-                   RecipeIngredient recipeIngredient = new RecipeIngredient();
-                   recipeIngredient.setId(UUID.randomUUID().toString());
-                   recipeIngredient.setRecipe(newRecipe);
-                   recipeIngredient.setIngredient(ingredients);
-                   recipeIngredient.setQuantity(ingredientDto.getQuantity());
-                   myRecipeIngredients.add(recipeIngredient);
-                ingredientRepository.save(ingredients);
-            }
+        if (!newIngredients.isEmpty()){
+            ingredientRepository.saveAll(newIngredients);
         }
-        newRecipe.setMyRecipeIngredients(myRecipeIngredients);
+
+        newRecipe.setMyRecipeIngredients(recipeIngredients);
         myRecipes.add(newRecipe);
-        User savedRecipe = userRepository.save(user);
-        recipeIngredientRepository.saveAll(myRecipeIngredients);
-        return new ResponseEntity<>(savedRecipe, HttpStatus.OK);
+
+        User save = userRepository.save(user);
+        return new ResponseEntity<>(save, HttpStatus.OK);
+    }
+
+
+    private Ingredient getOrCreate(CreateRecipeRequestDto.CreateIngredientDto ingredientDto
+            , List<Ingredient>ingredients
+    ) {
+        return ingredientRepository.findByName(ingredientDto.getIngredientName())
+                .orElseGet(()->{
+                    Ingredient ingredient = new Ingredient();
+                    ingredient.setId(UUID.randomUUID().toString());
+                    ingredient.setName(ingredientDto.getIngredientName());
+                    ingredients.add(ingredient);
+                    return ingredient;
+                });
     }
 }
+
