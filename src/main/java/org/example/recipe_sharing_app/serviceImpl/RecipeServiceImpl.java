@@ -8,15 +8,14 @@ import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.model.RecipeIngredient;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.IngredientRepository;
-import org.example.recipe_sharing_app.repository.RecipeIngredientRepository;
 import org.example.recipe_sharing_app.repository.RecipeRepository;
 import org.example.recipe_sharing_app.repository.UserRepository;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.example.recipe_sharing_app.util.InfoGetter;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -29,8 +28,6 @@ public class RecipeServiceImpl implements RecipeService {
     private final UserRepository userRepository;
 
     private final IngredientRepository ingredientRepository;
-
-    private final RecipeIngredientRepository recipeIngredientRepository;
 
     private final InfoGetter infoGetter;
     private final RecipeRepository recipeRepository;
@@ -76,6 +73,19 @@ public class RecipeServiceImpl implements RecipeService {
         return new ResponseEntity<>(save, HttpStatus.OK);
     }
 
+    @Transactional
+    @Override
+    public ResponseEntity<Recipe> getRecipe(String id) {
+        Recipe recipe = recipeRepository.findById(id)
+                .orElseThrow(()->new UsernameNotFoundException("Not found"));
+        return new ResponseEntity<>(recipe, HttpStatus.OK);
+    }
+
+    @Override
+    public List<Recipe> searchRecipe(String keyword) {
+        return recipeRepository.searchRecipe(keyword);
+    }
+
 
     private Ingredient getOrCreate(CreateRecipeRequestDto.CreateIngredientDto ingredientDto
             , List<Ingredient>ingredients
@@ -89,5 +99,8 @@ public class RecipeServiceImpl implements RecipeService {
                     return ingredient;
                 });
     }
+
+
+
 }
 
