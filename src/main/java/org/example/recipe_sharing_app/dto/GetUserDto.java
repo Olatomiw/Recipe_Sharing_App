@@ -44,6 +44,7 @@ public class GetUserDto {
     }
 
     @Builder
+    @Data
     public static class RatingDto{
         private String id;
         private int rating;

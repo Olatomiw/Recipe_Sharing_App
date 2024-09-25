@@ -2,7 +2,9 @@ package org.example.recipe_sharing_app.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.recipe_sharing_app.dto.CommentDto;
 import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
+import org.example.recipe_sharing_app.dto.GetUserDto;
 import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.springframework.http.HttpStatus;
@@ -35,5 +37,15 @@ public class RecipeController {
             return new ResponseEntity<>("No result",HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(recipes, HttpStatus.OK);
+    }
+
+    @PostMapping("/{id}/rate")
+    public ResponseEntity<?> rateRecipe(@PathVariable String id, @RequestBody GetUserDto.RatingDto rating){
+        return recipeService.rateRecipe(id,rating );
+    }
+
+    @PostMapping("/{id}/comment")
+    public ResponseEntity<?> commentRecipe(@PathVariable String id, @RequestBody CommentDto commentDto){
+        return recipeService.commentRecipe(id,commentDto);
     }
 }

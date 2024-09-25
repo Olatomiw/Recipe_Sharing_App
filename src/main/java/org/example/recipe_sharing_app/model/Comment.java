@@ -20,6 +20,7 @@ import java.util.List;
 public class Comment {
 
     @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
 
     private String message;
@@ -41,7 +42,7 @@ public class Comment {
     private Recipe recipe;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_comment_id", nullable = false)
+    @JoinColumn(name = "parent_comment_id", nullable = true)
     private Comment parent;
 
     @OneToMany (mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
