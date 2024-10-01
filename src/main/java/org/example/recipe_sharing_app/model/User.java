@@ -54,4 +54,7 @@ public class User {
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<SavedRecipe> my_saved_recipes;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Notification> my_notifications;
+
 }

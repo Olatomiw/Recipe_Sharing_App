@@ -59,4 +59,7 @@ public class Recipe {
     )
     private List<Tag> myTags;
 
+    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "recipe")
+    private List <Notification> myNotifications;
+
 }

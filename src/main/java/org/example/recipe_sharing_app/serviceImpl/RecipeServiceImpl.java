@@ -8,6 +8,7 @@ import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
 import org.example.recipe_sharing_app.dto.GetUserDto;
 import org.example.recipe_sharing_app.model.*;
 import org.example.recipe_sharing_app.repository.*;
+import org.example.recipe_sharing_app.service.NotificationService;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.example.recipe_sharing_app.util.InfoGetter;
 import org.springframework.http.HttpStatus;
@@ -29,6 +30,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RecipeRepository recipeRepository;
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
+    private final NotificationService notificationService;
 
 
     @Transactional
@@ -110,6 +112,8 @@ public class RecipeServiceImpl implements RecipeService {
                 .message(commentDto.getComment())
                 .parent(null)
                 .build();
+        String message = loggedInUser.getFirstname() + " commented on your recipe";
+        notificationService.createNotification(message, recipeById.getUser(), recipeById);
         commentRepository.save(comment);
         return new ResponseEntity<>(recipeById, HttpStatus.OK);
     }
