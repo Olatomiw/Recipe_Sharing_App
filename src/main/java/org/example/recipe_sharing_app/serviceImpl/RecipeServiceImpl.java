@@ -1,17 +1,20 @@
 package org.example.recipe_sharing_app.serviceImpl;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.example.recipe_sharing_app.dto.CommentDto;
 import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
 import org.example.recipe_sharing_app.dto.GetUserDto;
+import org.example.recipe_sharing_app.exception.DuplicateRecipeException;
+import org.example.recipe_sharing_app.exception.EntityNotFoundException;
 import org.example.recipe_sharing_app.model.*;
 import org.example.recipe_sharing_app.repository.*;
 import org.example.recipe_sharing_app.service.NotificationService;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.example.recipe_sharing_app.util.InfoGetter;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class RecipeServiceImpl implements RecipeService {
 
     private final UserRepository userRepository;
@@ -38,7 +42,10 @@ public class RecipeServiceImpl implements RecipeService {
     public ResponseEntity<?> createRecipe(CreateRecipeRequestDto recipeRequestDto) {
        User user= infoGetter.getLoggedInUser();
         assert user != null;
-        List<Recipe> myRecipes = user.getMy_recipes();
+
+        if (recipeRepository.findByTitleAndUser(recipeRequestDto.getRecipeName(), user).isPresent()){
+            throw new DuplicateRecipeException("Already Exists", HttpStatus.BAD_REQUEST.value());
+        }
 
         Recipe newRecipe = Recipe.builder()
                .id(UUID.randomUUID().toString())
@@ -62,12 +69,18 @@ public class RecipeServiceImpl implements RecipeService {
                             .build();
                 }).collect(Collectors.toList());
 
+
         if (!newIngredients.isEmpty()){
             ingredientRepository.saveAll(newIngredients);
         }
 
         newRecipe.setMyRecipeIngredients(recipeIngredients);
-        myRecipes.add(newRecipe);
+        if (user.getMy_recipes() == null){
+            user.setMy_recipes(List.of(newRecipe));
+        }else {
+            List<Recipe> myRecipes = new ArrayList<>(user.getMy_recipes());
+            myRecipes.add(newRecipe);
+        }
 
         User save = userRepository.save(user);
         return new ResponseEntity<>(save, HttpStatus.OK);
@@ -77,7 +90,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public ResponseEntity<Recipe> getRecipe(String id) {
         Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(()->new UsernameNotFoundException("Not found"));
+                .orElseThrow(()->new EntityNotFoundException("Not found", HttpStatus.NOT_FOUND));
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
@@ -112,6 +125,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .message(commentDto.getComment())
                 .parent(null)
                 .build();
+
         String message = loggedInUser.getFirstname() + " commented on your recipe";
         notificationService.createNotification(message, recipeById.getUser(), recipeById);
         commentRepository.save(comment);
@@ -138,7 +152,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     private Recipe getRecipeById(String id) {
         return recipeRepository.findById(id).orElseThrow(
-                ()->new EntityNotFoundException("Not found"));
+                ()->new EntityNotFoundException("Not found", HttpStatus.NOT_FOUND));
     }
 
 }

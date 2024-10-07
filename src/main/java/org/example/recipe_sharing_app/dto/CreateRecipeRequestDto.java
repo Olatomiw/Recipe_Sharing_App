@@ -19,6 +19,7 @@ public class CreateRecipeRequestDto {
     private List<CreateIngredientDto> ingredients;
 
     @Data
+    @Builder
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateIngredientDto {

@@ -1,6 +1,7 @@
 package org.example.recipe_sharing_app.repository;
 
 import org.example.recipe_sharing_app.model.Recipe;
+import org.example.recipe_sharing_app.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,6 +14,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, String> {
 
     @Override
     Optional<Recipe> findById(String id);
+
+    Optional<Recipe> findByTitleAndUser(String title, User user);
 
     @Query("SELECT p FROM Recipe p WHERE " +
             "LOWER(p.title)  Like LOWER(CONCAT('%', :keyword, '%')) OR " +
