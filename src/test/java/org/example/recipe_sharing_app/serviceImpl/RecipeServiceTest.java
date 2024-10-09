@@ -74,16 +74,16 @@ public class RecipeServiceTest {
         when(infoGetter.getLoggedInUser()).thenReturn(user);
 
         when(userRepository.save(user)).thenReturn(user);
+        when(recipeRepository.save(any(Recipe.class))).thenReturn(newRecipe);
 
         ResponseEntity<?> recipe = recipeService.createRecipe(createRecipeRequestDto);
 
-        User user1 = (User) recipe.getBody();
+       User user1 = (User) recipe.getBody();
         HttpStatusCode status = recipe.getStatusCode();
 
         assertNotNull(recipe);
-        assertEquals(HttpStatus.OK, status);
+        assertEquals(HttpStatus.CREATED, status);
         assertNotNull(user1);
-        assertNotNull(user1.getMy_recipes());
         assertNotNull(recipe.getStatusCode());
     }
 

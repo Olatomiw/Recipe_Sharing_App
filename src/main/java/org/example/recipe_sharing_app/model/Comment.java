@@ -31,7 +31,7 @@ public class Comment {
 
     private int likes = 0;
 
-    private int dislikes = 0;
+    private int dislikes;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_id", nullable = false) @JsonIgnore

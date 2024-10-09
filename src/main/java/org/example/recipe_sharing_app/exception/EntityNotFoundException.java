@@ -6,8 +6,8 @@ public class EntityNotFoundException extends RuntimeException{
 
     HttpStatusCode statusCode;
 
-    public EntityNotFoundException(String message, HttpStatusCode statusCode) {
+    public EntityNotFoundException(String message) {
         super(message);
-        this.statusCode = statusCode;
+
     }
 }

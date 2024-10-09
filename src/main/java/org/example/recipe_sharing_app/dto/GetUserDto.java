@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+
 import java.util.List;
 
 @Data
@@ -17,8 +18,9 @@ public class GetUserDto {
     private String email;
     private List<RecipeDto> recipeDtoList;
 
-    @Builder
-    public static class getCommentDto{
+    @Data
+    @AllArgsConstructor
+    public static class CommentDto{
         private String id;
         private String comment;
         private String date;
@@ -27,24 +29,24 @@ public class GetUserDto {
     }
 
     @Builder
-    public static class RecipeIngredientDto{
-        private String id;
-        private String name;
+    public record RecipeIngredientDto(String name, String quantity){
     }
 
-    @Builder
+    @Data
+    @AllArgsConstructor
     public static class RecipeDto {
-        private String name;
+
         private String id;
         private String title;
         private String description;
-        private List<getCommentDto> commentDtoList;
-        private List<RatingDto> ratingDtoList;
+        private String instructions;
         private List<RecipeIngredientDto> recipeIngredientDtoList;
+        private List<CommentDto> commentDtoList;
+        private List<RatingDto> ratingDtoList;
     }
 
-    @Builder
     @Data
+    @AllArgsConstructor
     public static class RatingDto{
         private String id;
         private int rating;

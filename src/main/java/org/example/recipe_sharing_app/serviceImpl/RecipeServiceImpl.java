@@ -14,9 +14,8 @@ import org.example.recipe_sharing_app.service.NotificationService;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.example.recipe_sharing_app.util.InfoGetter;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -60,7 +59,7 @@ public class RecipeServiceImpl implements RecipeService {
         List<RecipeIngredient> recipeIngredients = recipeRequestDto.getIngredients()
                 .stream()
                 .map(ingredientDto->{
-                    Ingredient ingredient =getOrCreate(ingredientDto, newIngredients);
+                    Ingredient ingredient =infoGetter.getOrCreate(ingredientDto, newIngredients);
                     return RecipeIngredient.builder()
                             .id(UUID.randomUUID().toString())
                             .ingredient(ingredient)
@@ -68,29 +67,28 @@ public class RecipeServiceImpl implements RecipeService {
                             .quantity(ingredientDto.getQuantity())
                             .build();
                 }).collect(Collectors.toList());
-
-
         if (!newIngredients.isEmpty()){
             ingredientRepository.saveAll(newIngredients);
         }
-
         newRecipe.setMyRecipeIngredients(recipeIngredients);
-        if (user.getMy_recipes() == null){
-            user.setMy_recipes(List.of(newRecipe));
-        }else {
-            List<Recipe> myRecipes = new ArrayList<>(user.getMy_recipes());
-            myRecipes.add(newRecipe);
-        }
 
+        List<Recipe> myRecipes = new ArrayList<>();
+        if (user.getMy_recipes() != null){
+            user.getMy_recipes().add(newRecipe);
+        }else {
+            myRecipes.add(newRecipe);
+            user.setMy_recipes(myRecipes);
+        }
+        Recipe save1 = recipeRepository.save(newRecipe);
         User save = userRepository.save(user);
-        return new ResponseEntity<>(save, HttpStatus.OK);
+        return new ResponseEntity<>(save, HttpStatus.CREATED);
     }
 
     @Transactional
     @Override
     public ResponseEntity<Recipe> getRecipe(String id) {
         Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("Not found", HttpStatus.NOT_FOUND));
+                .orElseThrow(()->new EntityNotFoundException("Not found"));
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
@@ -102,7 +100,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public ResponseEntity<?> rateRecipe(String id, GetUserDto.RatingDto ratingDto) {
-        Recipe recipe = getRecipeById(id);
+        Recipe recipe = infoGetter.getRecipeById(id);
         User loggedInUser = infoGetter.getLoggedInUser();
         Rating rating = Rating.builder()
                 .id(UUID.randomUUID().toString())
@@ -116,7 +114,7 @@ public class RecipeServiceImpl implements RecipeService {
 
     @Override
     public ResponseEntity<?> commentRecipe(String id, CommentDto commentDto) {
-        Recipe recipeById = getRecipeById(id);
+        Recipe recipeById = infoGetter.getRecipeById(id);
         User loggedInUser = infoGetter.getLoggedInUser();
         Comment comment = Comment.builder()
                 .id(UUID.randomUUID().toString())
@@ -130,29 +128,6 @@ public class RecipeServiceImpl implements RecipeService {
         notificationService.createNotification(message, recipeById.getUser(), recipeById);
         commentRepository.save(comment);
         return new ResponseEntity<>(recipeById, HttpStatus.OK);
-    }
-
-
-
-
-
-
-    private Ingredient getOrCreate(CreateRecipeRequestDto.CreateIngredientDto ingredientDto
-            , List<Ingredient>ingredients
-    ) {
-        return ingredientRepository.findByName(ingredientDto.getIngredientName())
-                .orElseGet(()->{
-                    Ingredient ingredient = new Ingredient();
-                    ingredient.setId(UUID.randomUUID().toString());
-                    ingredient.setName(ingredientDto.getIngredientName());
-                    ingredients.add(ingredient);
-                    return ingredient;
-                });
-    }
-
-    private Recipe getRecipeById(String id) {
-        return recipeRepository.findById(id).orElseThrow(
-                ()->new EntityNotFoundException("Not found", HttpStatus.NOT_FOUND));
     }
 
 }
