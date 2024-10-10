@@ -43,7 +43,7 @@ public class RecipeServiceImpl implements RecipeService {
         assert user != null;
 
         if (recipeRepository.findByTitleAndUser(recipeRequestDto.getRecipeName(), user).isPresent()){
-            throw new DuplicateRecipeException("Already Exists", HttpStatus.BAD_REQUEST.value());
+            throw new DuplicateRecipeException("Already Exists", HttpStatus.CONFLICT.value());
         }
 
         Recipe newRecipe = Recipe.builder()

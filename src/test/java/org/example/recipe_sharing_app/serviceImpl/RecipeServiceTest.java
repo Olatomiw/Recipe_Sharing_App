@@ -1,6 +1,7 @@
 package org.example.recipe_sharing_app.serviceImpl;
 
 import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
+import org.example.recipe_sharing_app.exception.DuplicateRecipeException;
 import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.IngredientRepository;
@@ -19,12 +20,13 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.FactoryBasedNavigableListAssert.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class RecipeServiceTest {
@@ -42,7 +44,6 @@ public class RecipeServiceTest {
     private RecipeServiceImpl recipeService;
 
     private CreateRecipeRequestDto createRecipeRequestDto;
-    private CreateRecipeRequestDto.CreateIngredientDto createIngredientDto;
     private User user;
     private Recipe newRecipe;
 
@@ -54,7 +55,7 @@ public class RecipeServiceTest {
                 .instructions("My Instructions")
                 .image("My Image")
                 .build();
-        createIngredientDto = CreateRecipeRequestDto.CreateIngredientDto
+        CreateRecipeRequestDto.CreateIngredientDto createIngredientDto = CreateRecipeRequestDto.CreateIngredientDto
                 .builder()
                 .ingredientName("My Ingredient")
                 .quantity("200 l")
@@ -70,7 +71,7 @@ public class RecipeServiceTest {
     }
 
     @Test
-    public void CreateRecipe_ShouldCreateSuccessfully() {
+  void CreateRecipe_ShouldCreateSuccessfully() {
         when(infoGetter.getLoggedInUser()).thenReturn(user);
 
         when(userRepository.save(user)).thenReturn(user);
@@ -85,6 +86,26 @@ public class RecipeServiceTest {
         assertEquals(HttpStatus.CREATED, status);
         assertNotNull(user1);
         assertNotNull(recipe.getStatusCode());
+        verify(userRepository, times(1)).save(any(User.class));
+
+    }
+
+    @Test
+    void ShouldThrow_DuplicateRecipeException(){
+
+        when(infoGetter.getLoggedInUser()).thenReturn(user);
+        when(recipeRepository.findByTitleAndUser(
+                createRecipeRequestDto.getRecipeName(), user))
+                .thenReturn(Optional.of(new Recipe()));
+
+        DuplicateRecipeException duplicateRecipeException = assertThrows(DuplicateRecipeException.class, () -> {
+            recipeService.createRecipe(createRecipeRequestDto);
+        });
+        assertEquals("Already Exists", duplicateRecipeException.getMessage());
+        verify(recipeRepository, times(1)).findByTitleAndUser(createRecipeRequestDto.getRecipeName(), user);
+        verifyNoMoreInteractions(recipeRepository);
+        verifyNoInteractions(userRepository);
+
     }
 
 }
