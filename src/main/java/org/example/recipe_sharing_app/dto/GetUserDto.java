@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CurrentTimestamp;
 
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class GetUserDto {
     public static class CommentDto{
         private String id;
         private String comment;
+        @CurrentTimestamp
         private String date;
         private int likes;
         private int dislikes;

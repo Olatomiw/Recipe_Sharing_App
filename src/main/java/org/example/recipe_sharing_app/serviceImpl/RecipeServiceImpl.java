@@ -88,7 +88,7 @@ public class RecipeServiceImpl implements RecipeService {
     @Override
     public ResponseEntity<Recipe> getRecipe(String id) {
         Recipe recipe = recipeRepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("Not found"));
+                 .orElseThrow(()->new EntityNotFoundException("Not found"));
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
@@ -100,8 +100,8 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public ResponseEntity<?> rateRecipe(String id, GetUserDto.RatingDto ratingDto) {
-        Recipe recipe = infoGetter.getRecipeById(id);
         User loggedInUser = infoGetter.getLoggedInUser();
+        Recipe recipe = infoGetter.getRecipeById(id);
         Rating rating = Rating.builder()
                 .id(UUID.randomUUID().toString())
                 .rating(ratingDto.getRating())
@@ -125,7 +125,7 @@ public class RecipeServiceImpl implements RecipeService {
                 .build();
 
         String message = loggedInUser.getFirstname() + " commented on your recipe";
-        notificationService.createNotification(message, recipeById.getUser(), recipeById);
+//        notificationService.createNotification(message, recipeById.getUser(), recipeById);
         commentRepository.save(comment);
         return new ResponseEntity<>(recipeById, HttpStatus.OK);
     }
