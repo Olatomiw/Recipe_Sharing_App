@@ -38,7 +38,7 @@ public class Recipe {
     @Column(name = "img_url")
     private String image;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy ="recipe")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy ="recipe")
     private List<Comment> myComments;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

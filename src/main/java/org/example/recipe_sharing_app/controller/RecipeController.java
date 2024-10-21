@@ -48,4 +48,9 @@ public class RecipeController {
     public ResponseEntity<?> commentRecipe(@PathVariable String id, @RequestBody CommentDto commentDto){
         return recipeService.commentRecipe(id,commentDto);
     }
+
+    @PostMapping("/saved/{id}")
+    public ResponseEntity<?> addToSavedRecipe(@PathVariable String id){
+        return recipeService.saveRecipe(id);
+    }
 }

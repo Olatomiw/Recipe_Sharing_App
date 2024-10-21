@@ -8,6 +8,7 @@ import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.model.User;
 import org.example.recipe_sharing_app.repository.IngredientRepository;
 import org.example.recipe_sharing_app.repository.RecipeRepository;
+import org.example.recipe_sharing_app.repository.SavedRecipeRepository;
 import org.example.recipe_sharing_app.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -15,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,6 +27,7 @@ public class InfoGetter {
     private final UserRepository userRepository;
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
+    private final SavedRecipeRepository savedRecipeRepository;
 
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -51,5 +54,10 @@ public class InfoGetter {
                     ingredients.add(ingredient);
                     return ingredient;
                 });
+    }
+
+    public List<?> getSavedRecipeByUserId(User user) {
+        return Collections.singletonList(savedRecipeRepository.findByUser(user).orElseThrow(
+                () -> new EntityNotFoundException("Not Found")));
     }
 }

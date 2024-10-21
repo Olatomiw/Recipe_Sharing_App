@@ -12,8 +12,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, String> {
 
     Optional<Recipe> findByTitle(String title);
 
-    @Override
-    Optional<Recipe> findById(String id);
+//    @Override
+//    Optional<Recipe> findById(String id);
 
     Optional<Recipe> findByTitleAndUser(String title, User user);
 

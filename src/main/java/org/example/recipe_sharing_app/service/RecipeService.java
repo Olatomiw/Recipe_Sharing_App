@@ -19,4 +19,6 @@ public interface RecipeService {
     ResponseEntity<?> rateRecipe(String id, GetUserDto.RatingDto ratingDto);
 
     ResponseEntity<?> commentRecipe(String id, CommentDto commentDto);
+
+    ResponseEntity<?> saveRecipe(String recipeId);
 }

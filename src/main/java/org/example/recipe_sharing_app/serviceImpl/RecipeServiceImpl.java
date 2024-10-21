@@ -34,6 +34,7 @@ public class RecipeServiceImpl implements RecipeService {
     private final RatingRepository ratingRepository;
     private final CommentRepository commentRepository;
     private final NotificationService notificationService;
+    private final SavedRecipeRepository savedRecipeRepository;
 
 
     @Transactional
@@ -87,9 +88,8 @@ public class RecipeServiceImpl implements RecipeService {
     @Transactional
     @Override
     public ResponseEntity<Recipe> getRecipe(String id) {
-        Recipe recipe = recipeRepository.findById(id)
-                 .orElseThrow(()->new EntityNotFoundException("Not found"));
-        return new ResponseEntity<>(recipe, HttpStatus.OK);
+        Recipe recipeById = infoGetter.getRecipeById(id);
+        return new ResponseEntity<>(recipeById, HttpStatus.OK);
     }
 
     @Override
@@ -123,12 +123,23 @@ public class RecipeServiceImpl implements RecipeService {
                 .message(commentDto.getComment())
                 .parent(null)
                 .build();
-
         String message = loggedInUser.getFirstname() + " commented on your recipe";
-//        notificationService.createNotification(message, recipeById.getUser(), recipeById);
+        notificationService.createNotification(message, recipeById.getUser(), recipeById);
         commentRepository.save(comment);
         return new ResponseEntity<>(recipeById, HttpStatus.OK);
     }
 
+    @Override
+    public ResponseEntity<?> saveRecipe(String id){
+        User loggedInUser = infoGetter.getLoggedInUser();
+        Recipe recipeById = infoGetter.getRecipeById(id);
+        SavedRecipe savedRecipe = SavedRecipe.builder()
+                .id(UUID.randomUUID().toString())
+                .user(loggedInUser)
+                .recipe(recipeById)
+                .build();
+        savedRecipeRepository.save(savedRecipe);
+        return new ResponseEntity<>("Saved", HttpStatus.CREATED);
+    }
 }
 

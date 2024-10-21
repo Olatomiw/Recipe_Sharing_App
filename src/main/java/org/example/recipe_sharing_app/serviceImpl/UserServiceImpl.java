@@ -28,6 +28,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
 
+    @Transactional
     @Override
     public ResponseEntity<?> userWithDetails(String id) {
         User user = userRepository.findById(id).orElseThrow(

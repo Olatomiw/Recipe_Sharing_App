@@ -2,6 +2,7 @@ package org.example.recipe_sharing_app.config;
 
 import lombok.RequiredArgsConstructor;
 import org.example.recipe_sharing_app.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -24,12 +25,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfig  {
 
-    private final AuthEntryPoint authEntryPoint;
     private final JWTAuthFilter jwtAuthFilter;
     private final UserRepository userRepository;
 
-    public SecurityConfig(AuthEntryPoint authEntryPoint, JWTAuthFilter jwtAuthFilter,UserRepository userRepository){
-        this.authEntryPoint = authEntryPoint;
+    @Autowired
+    public SecurityConfig(JWTAuthFilter jwtAuthFilter,UserRepository userRepository){
         this.jwtAuthFilter = jwtAuthFilter;
         this.userRepository = userRepository;
     }
@@ -38,16 +38,17 @@ public class SecurityConfig  {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         DefaultSecurityFilterChain defaultSecurityFilterChain = http
                 .csrf(e-> e.disable())
-                .exceptionHandling(e->e
-                        .authenticationEntryPoint(authEntryPoint))
-                .sessionManagement(e->e
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .formLogin(Customizer.withDefaults())
+                .oauth2Login(Customizer.withDefaults())
                 .authorizeHttpRequests(e-> e
-                        .requestMatchers("api/auth/**").permitAll()
+                        .requestMatchers("api/auth/**","/login").permitAll()
                         .requestMatchers(HttpMethod.POST).permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
+                .exceptionHandling(e->e
+                        .authenticationEntryPoint(new AuthEntryPoint()))
+                .sessionManagement(e->e
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
         return defaultSecurityFilterChain;
