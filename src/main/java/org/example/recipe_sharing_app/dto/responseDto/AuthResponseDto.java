@@ -1,4 +1,4 @@
-package org.example.recipe_sharing_app.dto;
+package org.example.recipe_sharing_app.dto.responseDto;
 
 import lombok.Builder;
 import lombok.Data;

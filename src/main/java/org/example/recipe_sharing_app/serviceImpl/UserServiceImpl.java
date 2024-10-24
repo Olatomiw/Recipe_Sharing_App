@@ -2,9 +2,9 @@ package org.example.recipe_sharing_app.serviceImpl;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.GetUserDto;
-import org.example.recipe_sharing_app.dto.UpdatePasswordRequest;
-import org.example.recipe_sharing_app.dto.UpdateUserRequest;
+import org.example.recipe_sharing_app.dto.requestDto.GetUserDto;
+import org.example.recipe_sharing_app.dto.requestDto.UpdatePasswordRequest;
+import org.example.recipe_sharing_app.dto.requestDto.UpdateUserRequest;
 import org.example.recipe_sharing_app.exception.EntityNotFoundException;
 import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.model.User;

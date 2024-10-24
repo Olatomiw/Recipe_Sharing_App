@@ -1,7 +1,6 @@
 package org.example.recipe_sharing_app.serviceImpl;
 
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.NotificationDto;
 import org.example.recipe_sharing_app.model.Notification;
 import org.example.recipe_sharing_app.model.Recipe;
 import org.example.recipe_sharing_app.model.User;

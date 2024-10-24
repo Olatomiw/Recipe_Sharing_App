@@ -6,11 +6,15 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-@Data
+
 @Builder
 @AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @Table (name = "recipes")
@@ -38,26 +42,38 @@ public class Recipe {
     @Column(name = "img_url")
     private String image;
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy ="recipe")
-    private List<Comment> myComments;
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy ="recipe")
+    private Set<Comment> myComments;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<RecipeIngredient> myRecipeIngredients;
+    private Set<RecipeIngredient> myRecipeIngredients;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> myRatings = new ArrayList<>();
+    private Set<Rating> myRatings = new HashSet<>();
 
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "recipe")
-    private List<SavedRecipe> mySavedRecipes;
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "recipe")
+    private Set<SavedRecipe> mySavedRecipes;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "recipe_tags", joinColumns = @JoinColumn(name = "recipe_id"),
+            name = "recipe_tags",joinColumns = @JoinColumn(name = "recipe_id"),
             inverseJoinColumns = @JoinColumn(name ="tag_id")
     )
-    private List<Tag> myTags;
+    private Set<Tag> myTags;
 
-    @OneToMany (cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "recipe")
-    private List <Notification> myNotifications;
+    @OneToMany (fetch = FetchType.LAZY, mappedBy = "recipe")
+    private Set <Notification> myNotifications;
 
+    @Override
+    public String toString() {
+        return "Recipe{" +
+                "id='" + id + '\'' +
+                ", title='" + title + '\'' +
+                ", description='" + description + '\'' +
+                ", instructions='" + instructions + '\'' +
+                ", user=" + user +
+                ", createdAt=" + createdAt +
+                ", image='" + image + '\'' +
+                '}';
+    }
 }

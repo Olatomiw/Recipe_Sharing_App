@@ -2,17 +2,16 @@ package org.example.recipe_sharing_app.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 @Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "recipe_ingredient")
-@Data
 public class RecipeIngredient {
 
     @Id
@@ -29,4 +28,9 @@ public class RecipeIngredient {
 
     @Column(nullable = false)
     private String quantity;
+
+
+    public Ingredient getIngredient(Ingredient ingredient) {
+        return this.ingredient;
+    }
 }

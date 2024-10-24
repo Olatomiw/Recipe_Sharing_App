@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface SavedRecipeRepository extends JpaRepository<SavedRecipe, String> {
 
-    Optional<SavedRecipe> findByUser(User user);
+    Optional<?> findByUserId(String id);
+//   findByUserId(String id);
 }

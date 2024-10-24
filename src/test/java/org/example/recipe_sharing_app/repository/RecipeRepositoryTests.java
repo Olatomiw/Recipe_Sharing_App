@@ -72,7 +72,7 @@ public class RecipeRepositoryTests {
 
     @Test
     public void RecipeRepository_FindAll_ReturnsSavedRecipe() {
-        userRepository.save(user);
+//        userRepository.save(user);
         recipeRepository.saveAll(Arrays.asList(recipe,recipe2));
         List<Recipe> savedRecipes = recipeRepository.findAll();
 

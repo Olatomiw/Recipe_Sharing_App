@@ -8,11 +8,12 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 
 @Builder
 @Entity
-@Data
 @Setter
 @Getter
 @NoArgsConstructor
@@ -44,21 +45,32 @@ public class User {
     private Boolean deleted = false;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List <Comment> my_comments;
+    private Set <Comment> my_comments;
 
-    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @ToString.Exclude
-    private List <Recipe> my_recipes;
+    private Set<Recipe> my_recipes;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Rating> my_ratings;
+    private Set<Rating> my_ratings;
 
     @OneToMany (mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<SavedRecipe> my_saved_recipes;
+    private Set<SavedRecipe> my_saved_recipes;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private List<Notification> my_notifications;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Notification> my_notifications;
 
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+                "id='" + id + '\'' +
+                ", firstname='" + firstname + '\'' +
+                ", lastname='" + lastname + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", is_verified=" + is_verified +
+                ", deleted=" + deleted +
+                '}';
+    }
 }

@@ -37,4 +37,13 @@ public class Ingredient {
     @JsonIgnore
     private List<RecipeIngredient> recipeIngredients;
 
+    @Override
+    public String toString() {
+        return "Ingredient{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}';
+    }
 }

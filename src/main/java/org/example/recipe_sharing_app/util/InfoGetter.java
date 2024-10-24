@@ -1,7 +1,8 @@
 package org.example.recipe_sharing_app.util;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
+import org.example.recipe_sharing_app.dto.requestDto.CreateRecipeRequestDto;
 import org.example.recipe_sharing_app.exception.EntityNotFoundException;
 import org.example.recipe_sharing_app.model.Ingredient;
 import org.example.recipe_sharing_app.model.Recipe;
@@ -29,6 +30,7 @@ public class InfoGetter {
     private final IngredientRepository ingredientRepository;
     private final SavedRecipeRepository savedRecipeRepository;
 
+    @Transactional
     public User getLoggedInUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication.isAuthenticated() && authentication.getPrincipal() instanceof UserDetails) {
@@ -38,11 +40,13 @@ public class InfoGetter {
         return null;
     }
 
+
     public Recipe getRecipeById(String id) {
         return recipeRepository.findById(id).orElseThrow(
                 ()->new EntityNotFoundException("Not found"));
     }
 
+    @Transactional
     public Ingredient getOrCreate(CreateRecipeRequestDto.CreateIngredientDto ingredientDto
             , List<Ingredient> ingredients
     ) {
@@ -56,8 +60,9 @@ public class InfoGetter {
                 });
     }
 
-    public List<?> getSavedRecipeByUserId(User user) {
-        return Collections.singletonList(savedRecipeRepository.findByUser(user).orElseThrow(
-                () -> new EntityNotFoundException("Not Found")));
+    @Transactional
+    public List<?> getSavedRecipeByUserId(String id) {
+        return Collections.singletonList((savedRecipeRepository.findByUserId(id).orElseThrow(
+                () -> new EntityNotFoundException("Not Found"))));
     }
 }

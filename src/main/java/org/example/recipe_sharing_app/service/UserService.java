@@ -1,7 +1,7 @@
 package org.example.recipe_sharing_app.service;
 
-import org.example.recipe_sharing_app.dto.UpdatePasswordRequest;
-import org.example.recipe_sharing_app.dto.UpdateUserRequest;
+import org.example.recipe_sharing_app.dto.requestDto.UpdatePasswordRequest;
+import org.example.recipe_sharing_app.dto.requestDto.UpdateUserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 

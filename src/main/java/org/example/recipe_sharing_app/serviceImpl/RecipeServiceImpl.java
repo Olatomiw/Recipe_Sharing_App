@@ -3,11 +3,11 @@ package org.example.recipe_sharing_app.serviceImpl;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.recipe_sharing_app.dto.CommentDto;
-import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
-import org.example.recipe_sharing_app.dto.GetUserDto;
+import org.example.recipe_sharing_app.dto.requestDto.CommentDto;
+import org.example.recipe_sharing_app.dto.requestDto.CreateRecipeRequestDto;
+import org.example.recipe_sharing_app.dto.requestDto.GetUserDto;
+import org.example.recipe_sharing_app.dto.responseDto.RecipeResponseDto;
 import org.example.recipe_sharing_app.exception.DuplicateRecipeException;
-import org.example.recipe_sharing_app.exception.EntityNotFoundException;
 import org.example.recipe_sharing_app.model.*;
 import org.example.recipe_sharing_app.repository.*;
 import org.example.recipe_sharing_app.service.NotificationService;
@@ -57,7 +57,7 @@ public class RecipeServiceImpl implements RecipeService {
                .build();
         List<Ingredient> newIngredients = new ArrayList<>();
 
-        List<RecipeIngredient> recipeIngredients = recipeRequestDto.getIngredients()
+        Set<RecipeIngredient> recipeIngredients = recipeRequestDto.getIngredients()
                 .stream()
                 .map(ingredientDto->{
                     Ingredient ingredient =infoGetter.getOrCreate(ingredientDto, newIngredients);
@@ -67,13 +67,13 @@ public class RecipeServiceImpl implements RecipeService {
                             .recipe(newRecipe)
                             .quantity(ingredientDto.getQuantity())
                             .build();
-                }).collect(Collectors.toList());
+                }).collect(Collectors.toSet());
         if (!newIngredients.isEmpty()){
             ingredientRepository.saveAll(newIngredients);
         }
         newRecipe.setMyRecipeIngredients(recipeIngredients);
 
-        List<Recipe> myRecipes = new ArrayList<>();
+        Set<Recipe> myRecipes = new HashSet<>();
         if (user.getMy_recipes() != null){
             user.getMy_recipes().add(newRecipe);
         }else {
@@ -85,16 +85,28 @@ public class RecipeServiceImpl implements RecipeService {
         return new ResponseEntity<>(save, HttpStatus.CREATED);
     }
 
-    @Transactional
     @Override
-    public ResponseEntity<Recipe> getRecipe(String id) {
+    @Transactional
+    public ResponseEntity<?> getRecipe(String id) {
         Recipe recipeById = infoGetter.getRecipeById(id);
-        return new ResponseEntity<>(recipeById, HttpStatus.OK);
+        RecipeResponseDto requestDto = new RecipeResponseDto(
+                recipeById.getTitle(),
+                recipeById.getDescription(),
+                recipeById.getInstructions(),
+                recipeById.getImage(),
+                recipeById.getMyRecipeIngredients()
+        );
+        return new ResponseEntity<>(requestDto, HttpStatus.OK);
     }
 
+    @Transactional
     @Override
-    public List<Recipe> searchRecipe(String keyword) {
-        return recipeRepository.searchRecipe(keyword);
+    public List<RecipeResponseDto> searchRecipe(String keyword) {
+        List<Recipe> recipes = recipeRepository.searchRecipe(keyword);
+        return recipes.stream()
+                .map((recipe)-> new RecipeResponseDto(
+                        recipe.getTitle(), recipe.getDescription(), recipe.getInstructions(), recipe.getImage(), recipe.getMyRecipeIngredients()
+                )).collect(Collectors.toList());
     }
 
     @Transactional
@@ -112,6 +124,7 @@ public class RecipeServiceImpl implements RecipeService {
         return new ResponseEntity<>(recipe, HttpStatus.OK);
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> commentRecipe(String id, CommentDto commentDto) {
         Recipe recipeById = infoGetter.getRecipeById(id);
@@ -129,6 +142,7 @@ public class RecipeServiceImpl implements RecipeService {
         return new ResponseEntity<>(recipeById, HttpStatus.OK);
     }
 
+    @Transactional
     @Override
     public ResponseEntity<?> saveRecipe(String id){
         User loggedInUser = infoGetter.getLoggedInUser();
@@ -139,7 +153,15 @@ public class RecipeServiceImpl implements RecipeService {
                 .recipe(recipeById)
                 .build();
         savedRecipeRepository.save(savedRecipe);
-        return new ResponseEntity<>("Saved", HttpStatus.CREATED);
+        return new ResponseEntity<>(savedRecipe, HttpStatus.CREATED);
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<?> getSavedRecipe(){
+        User loggedInUser = infoGetter.getLoggedInUser();
+        List<?> savedRecipeByUserId = infoGetter.getSavedRecipeByUserId(loggedInUser.getId());
+        return new ResponseEntity<>(loggedInUser, HttpStatus.OK);
     }
 }
 

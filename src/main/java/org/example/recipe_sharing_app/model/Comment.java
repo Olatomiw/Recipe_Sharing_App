@@ -45,7 +45,7 @@ public class Comment {
     @JoinColumn(name = "parent_comment_id", nullable = true)
     private Comment parent;
 
-    @OneToMany (mappedBy = "parent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany (mappedBy = "parent", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private List<Comment> comments;
 
 

@@ -1,8 +1,7 @@
-package org.example.recipe_sharing_app.dto;
+package org.example.recipe_sharing_app.dto.requestDto;
 
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @Builder

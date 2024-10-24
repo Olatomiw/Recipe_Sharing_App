@@ -21,12 +21,10 @@ public class SavedRecipe {
 
     @ManyToOne
     @JoinColumn(name = "recipe_id", nullable = false)
-    @JsonIgnore
     private Recipe recipe;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore
     private User user;
 
     @CreationTimestamp

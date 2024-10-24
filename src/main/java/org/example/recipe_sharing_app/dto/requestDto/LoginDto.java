@@ -1,4 +1,4 @@
-package org.example.recipe_sharing_app.dto;
+package org.example.recipe_sharing_app.dto.requestDto;
 
 import lombok.Data;
 
