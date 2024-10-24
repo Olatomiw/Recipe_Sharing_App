@@ -1,7 +1,7 @@
 package org.example.recipe_sharing_app.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.UpdatePasswordRequest;
+import org.example.recipe_sharing_app.dto.requestDto.UpdatePasswordRequest;
 import org.example.recipe_sharing_app.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

@@ -1,8 +1,7 @@
-package org.example.recipe_sharing_app.dto;
+package org.example.recipe_sharing_app.dto.requestDto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data

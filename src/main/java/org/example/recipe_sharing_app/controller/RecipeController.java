@@ -2,10 +2,10 @@ package org.example.recipe_sharing_app.controller;
 
 
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.CommentDto;
-import org.example.recipe_sharing_app.dto.CreateRecipeRequestDto;
-import org.example.recipe_sharing_app.dto.GetUserDto;
-import org.example.recipe_sharing_app.model.Recipe;
+import org.example.recipe_sharing_app.dto.requestDto.CommentDto;
+import org.example.recipe_sharing_app.dto.requestDto.CreateRecipeRequestDto;
+import org.example.recipe_sharing_app.dto.requestDto.GetUserDto;
+import org.example.recipe_sharing_app.dto.responseDto.RecipeResponseDto;
 import org.example.recipe_sharing_app.service.RecipeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ public class RecipeController {
 
     @GetMapping("/search")
     public ResponseEntity<?> searchRecipes(@RequestParam String keyword){
-        List<Recipe>recipes = recipeService.searchRecipe(keyword);
+        List<RecipeResponseDto>recipes = recipeService.searchRecipe(keyword);
         if (recipes.isEmpty()){
             return new ResponseEntity<>("No result",HttpStatus.NO_CONTENT);
         }
@@ -52,5 +52,10 @@ public class RecipeController {
     @PostMapping("/saved/{id}")
     public ResponseEntity<?> addToSavedRecipe(@PathVariable String id){
         return recipeService.saveRecipe(id);
+    }
+
+    @GetMapping("/savedRecipe")
+    public ResponseEntity<?> getSavedRecipe(){
+        return recipeService.getSavedRecipe();
     }
 }

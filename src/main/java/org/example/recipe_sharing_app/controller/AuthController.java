@@ -1,10 +1,8 @@
 package org.example.recipe_sharing_app.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.example.recipe_sharing_app.dto.LoginDto;
-import org.example.recipe_sharing_app.dto.RegisterDto;
-import org.example.recipe_sharing_app.model.User;
+import org.example.recipe_sharing_app.dto.requestDto.LoginDto;
+import org.example.recipe_sharing_app.dto.requestDto.RegisterDto;
 import org.example.recipe_sharing_app.service.AuthenticationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
